@@ -61,7 +61,7 @@ interface Props {
   totalItems: number;
   pageSize: number;
   onPageChange: (page: number) => void;
-  onPageSizeChange: (_: number, pageSize: number) => void;
+  onPageSizeChange: (pageSize: number) => void;
 }
 
 const TableView: FC<Props> = ({
@@ -85,8 +85,10 @@ const TableView: FC<Props> = ({
         pageSize: pageSize,
         pageSizeOptions: ["10", "20", "50", "100"],
         showSizeChanger: true,
-        onChange: onPageChange,
-        onShowSizeChange: onPageSizeChange,
+        onChange: (page, pageSize) => {
+          onPageChange(page); // set page
+          onPageSizeChange(pageSize); // set limit
+        },
       }}
     />
   );

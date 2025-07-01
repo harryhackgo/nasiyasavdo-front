@@ -1,39 +1,44 @@
+import React from "react";
+import { useSearchParams } from "react-router-dom";
+import TableView from "../components/table-view/TableView";
+import { usePartner } from "../service/usePartner";
 import Box from "@/shared/ui/Box";
 import Title from "@/shared/ui/Title";
-import React, { useState } from "react";
-import { usePartner } from "../service/usePartner";
-import TableView from "../components/table-view/TableView";
 
 const Partner = ({ role }: { role: string }) => {
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const page = searchParams.get("page") || "1";
+  const limit = searchParams.get("limit") || "10";
+
   const { data, isPending } = usePartner({
     role,
-    page: page.toString(),
-    limit: pageSize.toString(),
+    page: page,
+    limit: limit,
   });
-  console.log(data);
 
-  const handlePageChange = (newPage: number) => setPage(newPage);
-  const handlePageSizeChange = (_: number, newPageSize: number) => {
-    setPageSize(newPageSize);
-    setPage(1);
+  const handlePageChange = (newPage: number) => {
+    setSearchParams({ page: newPage.toString(), limit: limit, role });
+  };
+
+  const handlePageSizeChange = (newLimit: number) => {
+    setSearchParams({ page: "1", limit: newLimit.toString(), role });
   };
 
   return (
     <Box>
-      <Title className={"mb-4"}>
+      <Title className="mb-4">
         {role === "customer" ? "Mijozlar" : "Sotuvchilar"} ro'yxati
       </Title>
       <TableView
         data={data?.data ?? []}
         loading={isPending}
-        currentPage={data?.currentPage ?? 1}
+        currentPage={parseInt(page)}
         totalItems={data?.total ?? 0}
-        pageSize={pageSize}
-        onPageSizeChange={handlePageSizeChange}
+        pageSize={parseInt(limit)}
         onPageChange={handlePageChange}
-      ></TableView>
+        onPageSizeChange={handlePageSizeChange}
+      />
     </Box>
   );
 };
